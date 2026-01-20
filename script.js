@@ -6,14 +6,121 @@
 document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize all features
+  initNavigation();
   initScrollReveal();
   initSmoothScrolling();
   initTypingEffect();
   initScrollProgress();
   initCardAnimations();
+  initDownloadCV();
   
   console.log('✨ Portfolio loaded successfully!');
 });
+
+// ===================================
+// NAVIGATION BAR FUNCTIONALITY
+// ===================================
+function initNavigation() {
+  const navbar = document.querySelector('.navbar');
+  const navToggle = document.querySelector('.nav-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+  const navLinks = document.querySelectorAll('.nav-menu li a');
+  
+  // Mobile menu toggle
+  if (navToggle) {
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('active');
+      navMenu.classList.toggle('active');
+    });
+  }
+  
+  // Close mobile menu when clicking a link
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (navMenu.classList.contains('active')) {
+        navToggle.classList.remove('active');
+        navMenu.classList.remove('active');
+      }
+    });
+  });
+  
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!navbar.contains(e.target)) {
+      navToggle.classList.remove('active');
+      navMenu.classList.remove('active');
+    }
+  });
+  
+  // Add shadow to navbar on scroll
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });
+  
+  // Highlight active section in navigation
+  highlightActiveSection();
+  window.addEventListener('scroll', highlightActiveSection);
+  
+  // Scroll to top when clicking logo
+  const navLogo = document.querySelector('.nav-logo');
+  if (navLogo) {
+    navLogo.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+}
+
+function highlightActiveSection() {
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-menu li a:not(.download-btn)');
+  
+  let current = '';
+  
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.clientHeight;
+    
+    if (window.scrollY >= (sectionTop - 100)) {
+      current = section.getAttribute('id');
+    }
+  });
+  
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === `#${current}`) {
+      link.classList.add('active');
+    }
+  });
+}
+
+// ===================================
+// DOWNLOAD CV FUNCTIONALITY
+// ===================================
+function initDownloadCV() {
+  const downloadBtn = document.getElementById('download-cv');
+  
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Method 1: Print to PDF (browser's print dialog)
+      window.print();
+      
+      // Method 2: If you have a PDF file, uncomment below and add your CV file
+      // const link = document.createElement('a');
+      // link.href = 'path/to/your/cv.pdf';
+      // link.download = 'Samuel_Inkoom_Ninson_CV.pdf';
+      // link.click();
+    });
+  }
+}
 
 // ===================================
 // SCROLL REVEAL ANIMATION
@@ -69,10 +176,12 @@ function initSmoothScrolling() {
       if (href !== '#' && document.querySelector(href)) {
         e.preventDefault();
         const target = document.querySelector(href);
+        const navbarHeight = document.querySelector('.navbar').offsetHeight;
+        const targetPosition = target.offsetTop - navbarHeight - 20;
         
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
         });
       }
     });
