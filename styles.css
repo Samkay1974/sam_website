@@ -1,9 +1,4 @@
-/* ===================================
-   PROFESSIONAL PORTFOLIO CV STYLES
-   Modern, Clean & Responsive Design
-   =================================== */
 
-/* CSS Variables for Consistent Theming */
 :root {
   --primary-color: #2563eb;
   --primary-dark: #1e40af;
@@ -59,9 +54,7 @@ body::before {
   50% { background-position: 100% 50%; }
 }
 
-/* ===================================
-   NAVIGATION BAR
-   =================================== */
+
 .navbar {
   position: fixed;
   top: 0;
