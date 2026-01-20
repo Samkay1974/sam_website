@@ -1,38 +1,40 @@
 // ===================================
 // PORTFOLIO INTERACTIVE FEATURES
+// Professional & Optimized
 // ===================================
 
-// Wait for DOM to fully load
 document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize all features
   initScrollReveal();
-  initSmoothScroll();
-  initSkillsAnimation();
+  initSmoothScrolling();
   initTypingEffect();
   initScrollProgress();
-  initProjectHoverEffects();
+  initCardAnimations();
   
-  console.log('Portfolio initialized successfully! 🚀');
+  console.log('✨ Portfolio loaded successfully!');
 });
 
 // ===================================
 // SCROLL REVEAL ANIMATION
 // ===================================
 function initScrollReveal() {
-  const reveals = document.querySelectorAll('section, .card');
+  const elements = document.querySelectorAll('section, .card, .header');
   
-  reveals.forEach((element, index) => {
+  // Add reveal class to all elements
+  elements.forEach((element, index) => {
     element.classList.add('reveal');
-    element.style.transitionDelay = `${index * 0.1}s`;
   });
   
+  // Function to reveal elements on scroll
   const revealOnScroll = () => {
-    reveals.forEach(element => {
+    const windowHeight = window.innerHeight;
+    const revealPoint = 100;
+    
+    elements.forEach(element => {
       const elementTop = element.getBoundingClientRect().top;
-      const elementVisible = 150;
       
-      if (elementTop < window.innerHeight - elementVisible) {
+      if (elementTop < windowHeight - revealPoint) {
         element.classList.add('active');
       }
     });
@@ -41,19 +43,33 @@ function initScrollReveal() {
   // Initial check
   revealOnScroll();
   
-  // Check on scroll
-  window.addEventListener('scroll', revealOnScroll);
+  // Check on scroll with throttle for performance
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    if (scrollTimeout) {
+      window.cancelAnimationFrame(scrollTimeout);
+    }
+    scrollTimeout = window.requestAnimationFrame(() => {
+      revealOnScroll();
+    });
+  });
 }
 
 // ===================================
-// SMOOTH SCROLL FOR LINKS
+// SMOOTH SCROLLING FOR LINKS
 // ===================================
-function initSmoothScroll() {
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
+function initSmoothScrolling() {
+  const links = document.querySelectorAll('a[href^="#"]');
+  
+  links.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      
+      // Check if target exists
+      if (href !== '#' && document.querySelector(href)) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        
         target.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
@@ -64,98 +80,32 @@ function initSmoothScroll() {
 }
 
 // ===================================
-// SKILLS INTERACTIVE ANIMATION
-// ===================================
-function initSkillsAnimation() {
-  const skills = document.querySelectorAll('.skills span');
-  
-  skills.forEach((skill, index) => {
-    // Staggered animation on load
-    skill.style.opacity = '0';
-    skill.style.transform = 'scale(0.5)';
-    
-    setTimeout(() => {
-      skill.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-      skill.style.opacity = '1';
-      skill.style.transform = 'scale(1)';
-    }, index * 50);
-    
-    // Click to highlight
-    skill.addEventListener('click', function() {
-      // Remove highlight from all skills
-      skills.forEach(s => s.style.fontWeight = '500');
-      
-      // Highlight clicked skill
-      this.style.fontWeight = '700';
-      
-      // Create ripple effect
-      createRipple(this);
-    });
-  });
-}
-
-// ===================================
-// RIPPLE EFFECT
-// ===================================
-function createRipple(element) {
-  const ripple = document.createElement('span');
-  const rect = element.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height);
-  
-  ripple.style.width = ripple.style.height = size + 'px';
-  ripple.style.position = 'absolute';
-  ripple.style.borderRadius = '50%';
-  ripple.style.background = 'rgba(255, 255, 255, 0.6)';
-  ripple.style.transform = 'scale(0)';
-  ripple.style.animation = 'ripple 0.6s ease-out';
-  ripple.style.pointerEvents = 'none';
-  
-  element.style.position = 'relative';
-  element.style.overflow = 'hidden';
-  element.appendChild(ripple);
-  
-  setTimeout(() => ripple.remove(), 600);
-}
-
-// Add ripple animation to CSS dynamically
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes ripple {
-    to {
-      transform: scale(2);
-      opacity: 0;
-    }
-  }
-`;
-document.head.appendChild(style);
-
-// ===================================
 // TYPING EFFECT FOR SUBTITLE
 // ===================================
 function initTypingEffect() {
   const subtitle = document.querySelector('.subtitle');
   if (!subtitle) return;
   
-  const text = subtitle.textContent;
-  const typingSpeed = 100;
-  const deletingSpeed = 50;
-  const pauseDuration = 2000;
+  // Store original text
+  const originalText = subtitle.textContent;
   
-  // Alternative titles to cycle through
+  // Job titles to cycle through
   const titles = [
-    'Management Information Systems Student',
-    'Full-Stack Developer',
-    'Systems Analyst',
-    'Tech Enthusiast'
+    'Management Information Systems Student | Aspiring IT & Data Professional',
+    'Data Analyst | Systems Designer',
+    'Full-Stack Developer | Tech Enthusiast',
+    'IT Support Specialist | Problem Solver'
   ];
   
   let titleIndex = 0;
   let charIndex = 0;
   let isDeleting = false;
+  let isPaused = false;
   
   function type() {
     const currentTitle = titles[titleIndex];
     
+    // Update text
     if (isDeleting) {
       subtitle.textContent = currentTitle.substring(0, charIndex - 1);
       charIndex--;
@@ -165,14 +115,18 @@ function initTypingEffect() {
     }
     
     // Add blinking cursor
-    subtitle.innerHTML = subtitle.textContent + '<span style="animation: blink 0.7s infinite;">|</span>';
+    subtitle.innerHTML = subtitle.textContent + '<span class="cursor">|</span>';
     
-    let typeSpeed = isDeleting ? deletingSpeed : typingSpeed;
+    // Determine typing speed
+    let typeSpeed = isDeleting ? 50 : 100;
     
+    // Pause at end of typing
     if (!isDeleting && charIndex === currentTitle.length) {
-      typeSpeed = pauseDuration;
+      typeSpeed = 2000;
       isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
+    } 
+    // Move to next title after deleting
+    else if (isDeleting && charIndex === 0) {
       isDeleting = false;
       titleIndex = (titleIndex + 1) % titles.length;
       typeSpeed = 500;
@@ -181,134 +135,211 @@ function initTypingEffect() {
     setTimeout(type, typeSpeed);
   }
   
-  // Start typing effect after initial animation
+  // Add cursor blink animation
+  const style = document.createElement('style');
+  style.textContent = `
+    .cursor {
+      animation: blink 0.7s infinite;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Start typing effect after 1 second
   setTimeout(() => {
     subtitle.textContent = '';
     type();
-  }, 2000);
+  }, 1000);
 }
-
-// Add blink animation
-const blinkStyle = document.createElement('style');
-blinkStyle.textContent = `
-  @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-  }
-`;
-document.head.appendChild(blinkStyle);
 
 // ===================================
 // SCROLL PROGRESS INDICATOR
 // ===================================
 function initScrollProgress() {
-  // Create progress bar
+  // Create progress bar element
   const progressBar = document.createElement('div');
+  progressBar.id = 'scroll-progress';
   progressBar.style.cssText = `
     position: fixed;
     top: 0;
     left: 0;
     width: 0%;
-    height: 4px;
+    height: 3px;
     background: linear-gradient(90deg, #2563eb, #f59e0b);
     z-index: 9999;
-    transition: width 0.1s ease;
+    transition: width 0.2s ease;
   `;
   document.body.appendChild(progressBar);
   
+  // Update progress on scroll
+  let scrollTimeout;
   window.addEventListener('scroll', () => {
-    const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    const scrolled = (window.scrollY / windowHeight) * 100;
-    progressBar.style.width = scrolled + '%';
+    if (scrollTimeout) {
+      window.cancelAnimationFrame(scrollTimeout);
+    }
+    
+    scrollTimeout = window.requestAnimationFrame(() => {
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (window.scrollY / scrollHeight) * 100;
+      progressBar.style.width = scrolled + '%';
+    });
   });
 }
 
 // ===================================
-// PROJECT HOVER EFFECTS
+// CARD HOVER ANIMATIONS
 // ===================================
-function initProjectHoverEffects() {
-  const projects = document.querySelectorAll('.project');
+function initCardAnimations() {
+  const cards = document.querySelectorAll('.card');
   
-  projects.forEach(project => {
-    project.addEventListener('mouseenter', function() {
-      this.style.transform = 'scale(1.02)';
+  cards.forEach(card => {
+    // Add smooth transform on hover
+    card.addEventListener('mouseenter', function() {
+      this.style.transition = 'all 0.3s ease';
     });
     
-    project.addEventListener('mouseleave', function() {
-      this.style.transform = 'scale(1)';
+    card.addEventListener('mouseleave', function() {
+      this.style.transition = 'all 0.3s ease';
     });
   });
-}
-
-// ===================================
-// EASTER EGG: KONAMI CODE
-// ===================================
-let konamiCode = [];
-const konamiPattern = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-
-document.addEventListener('keydown', (e) => {
-  konamiCode.push(e.key);
-  konamiCode = konamiCode.slice(-10);
   
-  if (konamiCode.join('') === konamiPattern.join('')) {
-    activateEasterEgg();
+  // Add interactive effect to profile image
+  const profileImg = document.querySelector('.profile-img');
+  if (profileImg) {
+    let isAnimating = false;
+    
+    profileImg.addEventListener('click', function() {
+      if (isAnimating) return;
+      isAnimating = true;
+      
+      this.style.animation = 'none';
+      setTimeout(() => {
+        this.style.animation = 'scaleIn 0.6s ease-out';
+        isAnimating = false;
+      }, 10);
+    });
   }
-});
-
-function activateEasterEgg() {
-  document.body.style.animation = 'rainbow 2s linear infinite';
-  
-  const easterEggStyle = document.createElement('style');
-  easterEggStyle.textContent = `
-    @keyframes rainbow {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(easterEggStyle);
-  
-  setTimeout(() => {
-    document.body.style.animation = '';
-    easterEggStyle.remove();
-  }, 5000);
-  
-  console.log('🎉 Easter Egg Activated! You found the secret code!');
 }
 
 // ===================================
-// PERFORMANCE OPTIMIZATION
+// LAZY LOAD IMAGES (Performance Optimization)
 // ===================================
-// Lazy load images
 if ('IntersectionObserver' in window) {
   const imageObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const img = entry.target;
+        
+        // Load image if data-src exists
         if (img.dataset.src) {
           img.src = img.dataset.src;
           img.removeAttribute('data-src');
+          observer.unobserve(img);
         }
-        observer.unobserve(img);
       }
     });
   });
   
+  // Observe all images with data-src attribute
   document.querySelectorAll('img[data-src]').forEach(img => {
     imageObserver.observe(img);
   });
 }
 
 // ===================================
-// ANALYTICS (Optional - for tracking)
+// PRINT FUNCTIONALITY
 // ===================================
-function trackEvent(category, action, label) {
-  console.log(`Event tracked: ${category} - ${action} - ${label}`);
-  // You can integrate with Google Analytics or other services here
+function printCV() {
+  window.print();
 }
 
-// Track link clicks
-document.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', function() {
-    trackEvent('Navigation', 'Click', this.href);
-  });
+// Add print button listener if exists
+const printButton = document.getElementById('print-btn');
+if (printButton) {
+  printButton.addEventListener('click', printCV);
+}
+
+// ===================================
+// KEYBOARD SHORTCUTS
+// ===================================
+document.addEventListener('keydown', (e) => {
+  // Ctrl/Cmd + P for print
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    printCV();
+  }
+  
+  // Scroll to top with Home key
+  if (e.key === 'Home') {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  
+  // Scroll to bottom with End key
+  if (e.key === 'End') {
+    e.preventDefault();
+    window.scrollTo({ 
+      top: document.documentElement.scrollHeight, 
+      behavior: 'smooth' 
+    });
+  }
 });
+
+// ===================================
+// PERFORMANCE MONITORING
+// ===================================
+window.addEventListener('load', () => {
+  // Log performance metrics
+  if (window.performance) {
+    const perfData = window.performance.timing;
+    const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+    console.log(`📊 Page Load Time: ${pageLoadTime}ms`);
+  }
+});
+
+// ===================================
+// HANDLE ERRORS GRACEFULLY
+// ===================================
+window.addEventListener('error', (e) => {
+  console.error('An error occurred:', e.message);
+  // Prevent the error from disrupting user experience
+});
+
+// ===================================
+// ACCESSIBILITY ENHANCEMENTS
+// ===================================
+function initAccessibility() {
+  // Add skip to content link
+  const skipLink = document.createElement('a');
+  skipLink.href = '#main-content';
+  skipLink.textContent = 'Skip to main content';
+  skipLink.style.cssText = `
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #2563eb;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 10000;
+  `;
+  skipLink.addEventListener('focus', function() {
+    this.style.top = '0';
+  });
+  skipLink.addEventListener('blur', function() {
+    this.style.top = '-40px';
+  });
+  
+  document.body.insertBefore(skipLink, document.body.firstChild);
+  
+  // Add main content id if not exists
+  const firstSection = document.querySelector('section');
+  if (firstSection && !document.getElementById('main-content')) {
+    firstSection.id = 'main-content';
+  }
+}
+
+initAccessibility();
