@@ -252,7 +252,7 @@ body {
   color: var(--secondary-color);
   margin-bottom: 10px;
   font-weight: 700;
-  animation: fadeInUp 0.6s ease-out 0.2s both;
+  animation: fadeInUp 0.6s ease-out 0.1s both;
 }
 
 .subtitle {
