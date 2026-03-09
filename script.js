@@ -110,21 +110,18 @@ function initDownloadCV() {
     downloadBtn.addEventListener('click', (e) => {
       e.preventDefault();
       
-      // Method 1: Print to PDF (browser's print dialog)
-      window.print();
-      
-      // Method 2: If you have a PDF file, uncomment below and add your CV file
-      // const link = document.createElement('a');
-      // link.href = 'path/to/your/cv.pdf';
-      // link.download = 'Samuel_Inkoom_Ninson_CV.pdf';
-      // link.click();
+      // Download the PDF file
+      const link = document.createElement('a');
+      link.href = downloadBtn.getAttribute('href');
+      link.download = 'OFFICIAL_CV_Samuel_Ninson.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     });
   }
 }
 
-// ===================================
-// SCROLL REVEAL ANIMATION
-// ===================================
+
 function initScrollReveal() {
   const elements = document.querySelectorAll('section, .card, .header');
   
@@ -150,7 +147,6 @@ function initScrollReveal() {
   // Initial check
   revealOnScroll();
   
-  // Check on scroll with throttle for performance
   let scrollTimeout;
   window.addEventListener('scroll', () => {
     if (scrollTimeout) {
@@ -162,9 +158,6 @@ function initScrollReveal() {
   });
 }
 
-// ===================================
-// SMOOTH SCROLLING FOR LINKS
-// ===================================
 function initSmoothScrolling() {
   const links = document.querySelectorAll('a[href^="#"]');
   
@@ -202,8 +195,8 @@ function initTypingEffect() {
   const titles = [
     'Management Information Systems Student | Aspiring IT & Data Professional',
     'Data Analyst | Systems Designer',
-    'Full-Stack Developer | Tech Enthusiast',
-    'IT Support Specialist | Problem Solver'
+    'Graphic Designer | Tech Enthusiast',
+    'IT Support Specialist | Network Administrator',
   ];
   
   let titleIndex = 0;
