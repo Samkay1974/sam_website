@@ -110,13 +110,18 @@ function initDownloadCV() {
     downloadBtn.addEventListener('click', (e) => {
       e.preventDefault();
       
-      // Download the PDF file
-      const link = document.createElement('a');
-      link.href = downloadBtn.getAttribute('href');
-      link.download = 'OFFICIAL_CV_Samuel_Ninson.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Security confirmation prompt
+      const confirmed = confirm('You are about to download my CV document. Do you want to continue?');
+      
+      if (confirmed) {
+        // Download the PDF file
+        const link = document.createElement('a');
+        link.href = downloadBtn.getAttribute('href');
+        link.download = 'OFFICIAL CV_Samuel Ninson.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     });
   }
 }
